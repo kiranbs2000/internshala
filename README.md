@@ -14,3 +14,8 @@ This project scrapes data from a user-provided website using Puppeteer (Node.js)
 
 ```bash
 docker build -t devops-scraper .
+
+## Run the Container with a Custom URL
+docker run -e SCRAPE_URL=https://example.com -p 5000:5000 devops-scraper
+## Open your browser and go to:
+http://localhost:5000
