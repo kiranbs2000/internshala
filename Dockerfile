@@ -1,32 +1,37 @@
-# Stage 1: Scraper
-FROM ghcr.io/puppeteer/puppeteer:latest as scraper
+# Stage 1: Scraper (Node.js + Puppeteer)
+FROM ghcr.io/puppeteer/puppeteer:latest AS scraper
 
 WORKDIR /app
 
-# Install dependencies first (for cache)
-COPY package.json ./
-RUN npm install
+# Install dependencies (optimized caching layer)
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-# Add the scraping script
+# Add scraping script
 COPY scrape.js ./
 
-# Set default URL (can be overridden at runtime)
-ARG SCRAPE_URL=https://example.com
-ENV SCRAPE_URL=$SCRAPE_URL
+# Allow runtime URL override
+ENV SCRAPE_URL=https://example.com
 
-# Run scraper
-RUN node scrape.js
+# Run scraper (as CMD for runtime flexibility)
+CMD ["node", "scrape.js"]
 
-# Stage 2: Flask Web Server
-FROM python:3.10-slim
+# Stage 2: Web Server (Python + Flask)
+FROM python:3.10-slim AS server
 
 WORKDIR /app
 
+# Copy only the necessary artifacts
 COPY --from=scraper /app/scraped_data.json ./
 COPY server.py requirements.txt ./
 
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Health check and port exposure
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:5000/health || exit 1
 EXPOSE 5000
-CMD ["python", "server.py"]
 
+# Run Flask server
+CMD ["python", "server.py"]
