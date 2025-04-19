@@ -1,26 +1,30 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
+const url = process.env.SCRAPE_URL || 'https://example.com';
+
 (async () => {
-  const url = process.env.SCRAPE_URL || 'https://example.com';
+  try {
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    executablePath: '/usr/bin/chromium-browser'
-  });
+    const page = await browser.newPage();
+    await page.goto(url);
 
-  const page = await browser.newPage();
-  await page.goto(url);
+    const data = await page.evaluate(() => {
+      return {
+        title: document.title,
+        heading: document.querySelector('h1')?.innerText || 'No H1 found'
+      };
+    });
 
-  const scrapedData = await page.evaluate(() => {
-    return {
-      title: document.title,
-      heading: document.querySelector('h1')?.innerText || 'No H1 tag found'
-    };
-  });
-
-  fs.writeFileSync('scraped_data.json', JSON.stringify(scrapedData, null, 2));
-
-  await browser.close();
+    fs.writeFileSync('scraped_data.json', JSON.stringify(data, null, 2));
+    console.log('Scraped data saved!');
+    await browser.close();
+  } catch (err) {
+    console.error('Scraping failed:', err);
+    process.exit(1);
+  }
 })();
