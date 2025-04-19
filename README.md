@@ -4,7 +4,7 @@ This project scrapes data from a user-provided website using Puppeteer (Node.js)
 
 📌 Features
 
-Scrapes the page title and the first (<h1>) tag from a user-provided URL.
+Scrapes the page title and the first /<h1>/ tag from a user-provided URL.
 
 Serves the scraped data as JSON via HTTP using a Flask API.
 
