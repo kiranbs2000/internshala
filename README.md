@@ -4,7 +4,7 @@ This project scrapes data from a user-provided website using Puppeteer (Node.js)
 
 📌 Features
 
-Scrapes the page title and the first tag from a user-provided URL.
+Scrapes the page title and the first `<h1>` tag from a user-provided URL.
 
 Serves the scraped data as JSON via HTTP using a Flask API.
 
@@ -40,7 +40,7 @@ Puppeteer (Node.js Stage):
 
 The first stage of the Dockerfile uses Puppeteer in Node.js to scrape the content from a user-specified URL.
 
-It extracts the page title and the first <h1> tag from the HTML of the page.
+It extracts the page title and the first `<h1>` tag from the HTML of the page.
 
 The data is saved as a JSON object.
 
