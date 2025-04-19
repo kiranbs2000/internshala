@@ -50,4 +50,15 @@ The second stage of the Dockerfile sets up a Python Flask app to serve the scrap
 
 The Flask API listens for requests on port 5000 and returns the scraped content in JSON format.
 
+Output response:
+
+{
+ 
+  "title": "Example Page Title",
+  
+  "h1": "Example Heading"
+
+}
+
+
 
