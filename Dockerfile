@@ -4,7 +4,7 @@ FROM ghcr.io/puppeteer/puppeteer:latest AS scraper
 WORKDIR /app
 
 # Install dependencies (optimized caching layer)
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm ci --omit=dev
 
 # Add scraping script
