@@ -1,8 +1,7 @@
 {
   "name": "web-scraper",
   "version": "1.0.0",
-  "main": "scrape.js",
   "dependencies": {
-    "puppeteer": "^21.7.0"
+    "puppeteer": "^21.0.0"
   }
 }

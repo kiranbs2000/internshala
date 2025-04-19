@@ -1,33 +1,23 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-const url = process.argv[2] || process.env.SCRAPE_URL || 'https://example.com';
-const outputFile = 'scraped_data.json';
+const url = process.env.SCRAPE_URL || 'https://example.com';
 
 (async () => {
   const browser = await puppeteer.launch({
-    headless: "new",
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    headless: true,
+    executablePath: '/usr/bin/chromium-browser',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
-  try {
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2' });
-    
-    const data = {
-      title: await page.title(),
-      heading: await page.$eval('h1', el => el.textContent.trim()) || 'No H1 found',
-      url: url,
-      scraped_at: new Date().toISOString()
-    };
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-    fs.writeFileSync(outputFile, JSON.stringify(data, null, 2));
-    console.log(`Successfully scraped ${url}`);
-  } catch (err) {
-    console.error('Scraping failed:', err);
-    process.exit(1);
-  } finally {
-    await browser.close();
-  }
+  const result = await page.evaluate(() => ({
+    title: document.title,
+    heading: document.querySelector('h1')?.innerText || 'No H1 found'
+  }));
+
+  fs.writeFileSync('scraped_data.json', JSON.stringify(result, null, 2));
+  await browser.close();
 })();
